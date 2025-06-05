@@ -16,22 +16,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { v4 as uuidv4 } from 'uuid';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Sparkle } from "lucide-react";
+import { Loader2Icon, Sparkle } from "lucide-react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 const AddNewCourseDialogue = ({ children }) => {
+  const [IsLoading, setIsLoading] = useState(false)
   const [DataForm, setDataForm] = useState(
     {
        name : "" ,
        description : "",
-       NoOfChapters : 1,
-       IncludeVideo:false,
+       noOfChapters : 1,
+       includeVideo:false,
        level:''
     }
   );
-
+  const router= useRouter()
   const HandleChanges = (field, value) => {
     setDataForm((prev) => ({
       ...prev,
@@ -40,9 +44,17 @@ const AddNewCourseDialogue = ({ children }) => {
     console.log(DataForm)
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault()
+  const onSubmit = async() => {
     console.log(DataForm)
+    const CourseID = uuidv4()
+    setIsLoading(true)
+    const result = await axios.post('/api/generate-ai-course-layout' , {
+      ...DataForm,
+      CourseID :CourseID
+    })
+    console.log('the data is ' ,result.data)
+    setIsLoading(false)
+    router.push("/workspace/edit-course/"+result.data?.CourseID)
   }
 
 
@@ -73,14 +85,14 @@ const AddNewCourseDialogue = ({ children }) => {
                 <Input 
                 placeholder="No. Of Chapters" 
                 type="number" 
-                onChange={(e) => HandleChanges("NoOfChapters", e?.target.value)}
+                onChange={(e) => HandleChanges("noOfChapters", e?.target.value)}
                 
                 />
               </div>
               <div className="flex gap-3 items-center">
                 <label htmlFor="">Include Video </label>
                 <Switch
-                onCheckedChange={() => HandleChanges("IncludeVideo" , !DataForm?.includeVideo)}
+                onCheckedChange={() => HandleChanges("includeVideo" , !DataForm?.includeVideo)}
                 />
               </div>
               <div>
@@ -97,8 +109,10 @@ const AddNewCourseDialogue = ({ children }) => {
                 </Select>
               </div>
               <div className="mt-3">
-                <Button className={"w-full cursor-pointer"} onClick = {onSubmit}>
-                  <Sparkle /> Generate Course
+                <Button className={"w-full cursor-pointer"} onClick = {onSubmit} disabled = {IsLoading}>
+                  {IsLoading ? <Loader2Icon className="animate-spin"/> : 
+                  <Sparkle />}
+                  Generate Course
                 </Button>
               </div>
             </div>
