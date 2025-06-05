@@ -17,15 +17,15 @@ const Prompt = `Genrate Learning Course depends on following details. In which M
 "topics": [
 "string"
 User Input: `;
+    export const ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+    });
 
 export const POST = async (req) => {
   try {
     const {CourseID,...DataForm} = await req.json();
     const user = await currentUser();
 
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
-    });
 
     const model = 'gemini-2.0-flash';
     const config = {
