@@ -17,6 +17,7 @@ export const coursesTable = pgTable("courses" , {
   includeVideo: boolean().default(false),
   level : varchar().notNull(),
   courseJson : json() ,
+  courseInfo :json().default({}),
   userEmail : varchar('userEmail').references(() => usersTable.email).notNull(),
   bannerImage : varchar().default('')
 })

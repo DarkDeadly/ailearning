@@ -1,12 +1,15 @@
 "use client"
 import { Button } from '@/components/ui/button'
+import { toast } from "sonner"
 import axios from 'axios'
 import { Book, Clock, Loader2Icon, Settings, TrendingUp } from 'lucide-react'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
 const CourseInfo = ({course}) => {
     const CourseContent = course?.courseJson?.course
+    const router = useRouter()
     const [isLoading, setisLoading] = useState(false)
     const GenerateCourseContent = async () => {
         setisLoading(true)
@@ -18,9 +21,11 @@ const CourseInfo = ({course}) => {
         })
         console.log(result.data)
         setisLoading(false)
-
+        router.push("/workspace")
+        toast.success("successfully Generated the course")
        } catch (error) {
         console.log(error)
+        toast.error("server side error !! try again")
        }
     }
 

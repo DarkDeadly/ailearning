@@ -1,15 +1,27 @@
+import axios from "axios";
 import {ai} from "../generate-ai-course-layout/route"
 import { NextResponse } from 'next/server';
+import { db } from "@/config/db";
+import { coursesTable } from "@/config/schema";
+import { eq } from "drizzle-orm";
 
 const PROMPT = `
-Depends on Chapter name and Topic Generate content for each topic in HTML
-and give response in JSON format.
-Schema:{
-chapterName:<>
+You are a content generator. Given a chapter with topics, generate HTML content for each topic and return the result in *pure JSON only*. Do not add extra explanations or markdown.
+
+Example schema:
 {
-topic:<>
-content:<>
-: User Input:`
+  "chapterName": "Getting Started",
+  "topics": [
+    {
+      "topic": "What is React Native?",
+      "content": "<p>React Native is ...</p>"
+    },
+    ...
+  ]
+}
+
+Now generate content for this chapter:
+`;
 
 export const POST  = async(req) => {
     const {courseJson , courseTitle , courseId} = await req.json()
@@ -17,7 +29,7 @@ export const POST  = async(req) => {
          const config = {
     responseMimeType: 'text/plain',
   };
-  const model = 'gemini-2.0-flash';
+  const model = 'gemini-2.5-flash-preview-04-17';
   const contents = [
     {
       role: 'user',
@@ -39,16 +51,46 @@ export const POST  = async(req) => {
   const RawJSon = JsonRes.replace('```json' , '').replace('```' , '')
  try {
   const JSonResponse = JSON.parse(RawJSon);
-  return JSonResponse;
+  const YoutubeContent = await GenerateVideo(chapter?.chapterName)
+  return {
+    youtubeVIdeo : YoutubeContent,
+    courseData:JSonResponse
+  };
 } catch (error) {
   console.error("❌ JSON parse error:", error.message);
   console.log("🔥 Raw JSON that failed:", RawJSon);
- 
+  return null;
 }
     })
     const CourseContent = await Promise.all(promises) 
+    const dbresp = await db.update(coursesTable).set({
+        courseInfo:JSON.stringify(CourseContent)
+    }).where(eq(coursesTable.cid ,courseId ))
     return NextResponse.json({
         courseName : courseTitle,
         courseContent : CourseContent
     })
+}
+
+const YoutubeURL = 'https://www.googleapis.com/youtube/v3/search'
+const GenerateVideo = async(topic) => {
+    const Params = {
+        part: 'snippet',
+        q:topic,
+        maxResult:4,
+        type:'video',
+        key:process.env.YOUTUBE_API_KEY
+    }
+    const response = await axios.get(YoutubeURL,{params :Params})
+    const VideoListResponse = response.data.items
+    const VideoList = []
+    VideoListResponse.forEach(item => {
+        const data = {
+            videoId : item.id?.videoId,
+            title : item?.snippet?.title
+        }
+        VideoList.push(data)
+    })
+    console.log("VideoList" , VideoList)
+    return VideoList
 }
