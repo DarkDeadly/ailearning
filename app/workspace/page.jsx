@@ -1,14 +1,16 @@
-import React from 'react'
-import WelcomeBanner from './_components/WelcomeBanner'
-import CourseList from './_components/CourseList'
+import React from "react";
+import WelcomeBanner from "./_components/WelcomeBanner";
+import CourseList from "./_components/CourseList";
+import EnrollCourseList from "./_components/EnrollCourseList";
 
 const WorkSpace = () => {
   return (
     <div>
-        <WelcomeBanner/>
-        <CourseList/>
+      <WelcomeBanner />
+      <EnrollCourseList />
+      <CourseList />
     </div>
-  )
-}
+  );
+};
 
-export default WorkSpace
+export default WorkSpace;
