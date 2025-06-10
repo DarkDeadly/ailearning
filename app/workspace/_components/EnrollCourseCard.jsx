@@ -8,7 +8,7 @@ import React from 'react'
 const EnrollCourseCard = ({courses , enrollcourses}) => {
         const CourseContent = courses?.courseJson?.course
         const calculateProgressBar = () => {
-            return (enrollcourses?.completedChapters?.length??0 / courses?.courseInfo?.length)
+            return (enrollcourses?.completedChapters?.length??0 / courses?.courseInfo?.length)*100
         }
   return (
      <div className='shadow-2xl rounded-xl'>
@@ -25,7 +25,7 @@ const EnrollCourseCard = ({courses , enrollcourses}) => {
             <div>
                 <h2 className='flex justify-between text-primary text-sm'>Progress : <span>{calculateProgressBar()}%</span></h2>
                 <Progress value={calculateProgressBar()} />
-                <Link href={'/workspace/course/' + courses?.cid}>
+                <Link href={'/workspace/view-course/' + courses?.cid}>
                 <Button className={'w-full mt-2 cursor-pointer'}><PlayCircle/> Start Learning</Button>
                 </Link>
             </div>
