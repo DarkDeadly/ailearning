@@ -6,6 +6,7 @@ import { Book, Clock, Loader2Icon, PlayCircle, Settings, TrendingUp } from 'luci
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
+import Link from 'next/link'
 
 const CourseInfo = ({course , viewCourse}) => {
     const CourseContent = course?.courseJson?.course
@@ -59,7 +60,7 @@ const CourseInfo = ({course , viewCourse}) => {
 
             </div>
                {!viewCourse ? <Button className={'cursor-pointer max-w-sm'} onClick={GenerateCourseContent}>{isLoading ? <Loader2Icon className='animate-spin' /> : <Settings/>}Generate Content</Button>: 
-               <Button className={'cursor-pointer max-w-sm'}> <PlayCircle/>Continue Learning</Button>
+               <Link href={"/course/" + course?.cid} asChild><Button className={'cursor-pointer max-w-sm'}> <PlayCircle/>Continue Learning</Button></Link>
                }
 
         </div>
