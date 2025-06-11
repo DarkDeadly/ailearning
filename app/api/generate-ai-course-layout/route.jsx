@@ -1,8 +1,9 @@
 import { db } from '@/config/db';
 import { coursesTable } from '@/config/schema';
-import { currentUser } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { GoogleGenAI } from '@google/genai';
 import axios from 'axios';
+import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 const Prompt = `Genrate Learning Course depends on following details. In which Make sure to add Course Name, Description, Course Banner Image Prompt (Create a modern, flat-style 2D digital illustration representing user Topic. Include UI/UX elements such as mockup screens, text blocks, icons, buttons, and creative workspace tools. Add symbolic elements related to user Course, like sticky notes, design components, and visual aids. Use a vibrant color palette (blues, purples, oranges) with a clean, professional look. The illustration should feel creative, tech-savvy, and educational, ideal for visualizing concepts in user Course) for Course Banner in 3d format Chapter Name,, Topic under each chapters, Duration for each chapters etc, in JSON format only Schema:
 {
@@ -25,7 +26,8 @@ export const POST = async (req) => {
   try {
     const {CourseID,...DataForm} = await req.json();
     const user = await currentUser();
-
+    const { has } = await auth()
+    const hasPremiumAccess = has({ plan: 'starter' })
 
     const model = 'gemini-2.0-flash';
     const config = {
@@ -41,7 +43,14 @@ export const POST = async (req) => {
         ],
       },
     ];
+    if (!hasPremiumAccess) {
+      const result = await db.select().from(coursesTable)
+      .where(eq(coursesTable.userEmail , user?.primaryEmailAddress.emailAddress))
 
+      if (result?.length>=1) {
+        return NextResponse.json({'message : ' : "Limit Exceed"})
+      }
+    }
     const response = await ai.models.generateContent({
       model,
       config,

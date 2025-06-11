@@ -53,6 +53,9 @@ const AddNewCourseDialogue = ({ children }) => {
       CourseID :CourseID
     })
     console.log('the data is ' ,result.data)
+    if (result.data.message == "Limit Exceed") {
+      router.push("/workspace/billing")
+    }
     setIsLoading(false)
     router.push("/workspace/edit-course/"+result.data?.CourseID)
   }
