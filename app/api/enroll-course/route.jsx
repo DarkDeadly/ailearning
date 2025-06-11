@@ -66,3 +66,15 @@ export const GET = async (req) => {
     return NextResponse.json(result);
   }
 };
+
+export const PUT = async(req) => {
+    const {courseId , completedChapter} = await req.json()
+    const user = await currentUser()
+
+    const result = await db.update(enrollCourseTable).set({
+        completedChapters : JSON.stringify(completedChapter)
+    }).where(and(eq(enrollCourseTable.cid , courseId) , eq(enrollCourseTable.userEmail, user?.primaryEmailAddress.emailAddress))
+).returning(enrollCourseTable)
+return NextResponse.json(result)
+}
+ 

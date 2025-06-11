@@ -60,7 +60,7 @@ const CourseInfo = ({course , viewCourse}) => {
 
             </div>
                {!viewCourse ? <Button className={'cursor-pointer max-w-sm'} onClick={GenerateCourseContent}>{isLoading ? <Loader2Icon className='animate-spin' /> : <Settings/>}Generate Content</Button>: 
-               <Link href={"/course/" + course?.cid} asChild><Button className={'cursor-pointer max-w-sm'}> <PlayCircle/>Continue Learning</Button></Link>
+               <Link href={"/course/" + course?.cid} ><Button className={'cursor-pointer max-w-sm'}> <PlayCircle/>Continue Learning</Button></Link>
                }
 
         </div>

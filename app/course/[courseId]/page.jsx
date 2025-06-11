@@ -30,7 +30,7 @@ const Course = () => {
         <div className="w-80 min-w-[20rem] bg-secondary">
           <ChapterListSideBar CourseInformation={CourseInformation} />
         </div>
-        <ChapterContent CourseInformation={CourseInformation} />
+        <ChapterContent CourseInformation={CourseInformation} RefreshData = {() => GetEnrolledCourseById()} />
       </div>
     </div>
   );
